@@ -1,0 +1,202 @@
+<%- include("layouts/header") %>
+<%- include("layouts/navbar") %>
+
+<div class="container my-5">
+    <h2 class="text-center mb-4 fw-bold animate-slide-down">📜 All Snippets</h2>
+
+    <div class="row" id="snippetContainer">
+        <% if (snippets.length === 0) { %>
+            <div class="col-12 text-center">
+                <div class="alert alert-warning p-4 rounded-4 shadow">
+                    <h4 class="fw-bold">😔 No Snippets Found</h4>
+                    <p class="mb-0">Start by adding some awesome code snippets!</p>
+                </div>
+            </div>
+        <% } else { %>
+            <% snippets.forEach(snippet => { %>
+                <div class="col-md-6 col-lg-4 mb-4 snippet-card" id="snippet-<%= snippet._id %>">
+                    <div class="card shadow-lg border-0 rounded-4 p-3 animate-fade-in">
+                        <!-- Snippet Title -->
+                        <h4 class="fw-bold"><%= snippet.title %></h4>
+
+                        <!-- Code Block with Syntax Highlighting -->
+                        <pre><code class="language-javascript"><%= snippet.code %></code></pre>
+
+                        <!-- Created By -->
+                        <p class="text-muted"><strong>👤 Created By:</strong> <%= snippet.userDetails.name %></p>
+
+                        <!-- Delete Button -->
+                        <button class="btn btn-danger w-100 mt-2 animate-button delete-snippet" data-id="<%= snippet._id %>">
+                            🗑 Delete
+                        </button>
+
+                        <!-- Spinner (Initially Hidden) -->
+                        <div class="text-center mt-2 delete-spinner" id="spinner-<%= snippet._id %>" style="display: none;">
+                            <div class="spinner-border text-danger" role="status">
+                                <span class="visually-hidden">Deleting...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+
+    <!-- Create Snippet Button -->
+    <div class="text-center mt-4">
+        <a href="/create" class="btn btn-success btn-lg create-snippet-btn">
+             Create Snippet
+        </a>
+    </div>
+</div>
+
+<%- include("layouts/footer") %>
+
+<!-- Prism.js for Syntax Highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".delete-snippet").forEach(button => {
+            button.addEventListener("click", function () {
+                const snippetId = this.getAttribute("data-id");
+                const snippetCard = document.getElementById(`snippet-${snippetId}`);
+                const spinner = document.getElementById(`spinner-${snippetId}`);
+
+                // Hide delete button & show spinner
+                this.style.display = "none";
+                spinner.style.display = "block";
+
+                fetch(`/api/delete/${snippetId}`, { method: "DELETE" })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            snippetCard.remove(); // Remove snippet from UI
+                            if (document.querySelectorAll(".snippet-card").length === 0) {
+                                document.getElementById("snippetContainer").innerHTML = `
+                                    <div class="col-12 text-center">
+                                        <div class="alert alert-warning p-4 rounded-4 shadow">
+                                            <h4 class="fw-bold">😔 No Snippets Found</h4>
+                                            <p class="mb-0">Start by adding some awesome code snippets!</p>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    })
+                    .catch(error => console.error("Error deleting snippet:", error));
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Ensure All Snippet Boxes Are the Same Size */
+    .snippet-card .card {
+        height: 300px; /* Fixed height */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+    }
+
+    /* Code Block Styling */
+    .snippet-card pre {
+        height: 150px; /* Fixed height for code blocks */
+        overflow: auto; /* Enable scrolling for long code */
+        background: #282c34;
+        color: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    /* Snippet Title Styling */
+    .snippet-card h4 {
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Create Snippet Button */
+    .create-snippet-btn {
+        padding: 12px 24px;
+        font-size: 18px;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .create-snippet-btn:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* Fade-in Animation */
+    .animate-fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.8s ease-in-out forwards;
+    }
+
+    /* Slide-down Animation */
+    .animate-slide-down {
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: slideDown 0.8s ease-in-out forwards;
+    }
+
+    /* Button Animation */
+    .animate-button {
+        transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
+    }
+
+    .animate-button:hover {
+        transform: scale(1.05);
+        animation: bounce 0.3s ease-in-out;
+    }
+
+    /* Card Hover Effect */
+    .card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+    }
+</style>

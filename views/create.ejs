@@ -1,0 +1,129 @@
+<%- include("layouts/header") %>
+<%- include("layouts/navbar") %>
+
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0 rounded-4 p-4 animate-fade-in">
+            <h2 class="text-center mb-4 fw-bold animate-slide-down">✍️ Create a Snippet</h2>
+
+            <form action="/api/create" method="POST">
+                <!-- Title Input -->
+                <div class="mb-3">
+                    <label for="title" class="form-label fw-semibold">📌 Title</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-pencil-square"></i></span>
+                        <input type="text" class="form-control animate-input" id="title" name="title" placeholder="Enter snippet title" required>
+                    </div>
+                </div>
+
+                <!-- Code Input -->
+                <div class="mb-3">
+                    <label for="code" class="form-label fw-semibold">💻 Code</label>
+                    <textarea class="form-control animate-input" id="code" name="code" rows="5" placeholder="Paste or write your code here..." required></textarea>
+                </div>
+
+                <!-- Language Selection -->
+                <div class="mb-3">
+                    <label for="language" class="form-label fw-semibold">🌍 Programming Language</label>
+                    <select class="form-select animate-input" id="language" name="language" required>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Python">Python</option>
+                        <option value="Java">Java</option>
+                        <option value="C++">C++</option>
+                        <option value="C#">C#</option>
+                        <option value="Go">Go</option>
+                        <option value="PHP">PHP</option>
+                        <option value="Ruby">Ruby</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-gradient btn-lg w-100 mt-3 animate-button">🚀 Create Snippet</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include("layouts/footer") %>
+
+<style>
+    /* Card Animation */
+    .animate-fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.8s ease-in-out forwards;
+    }
+
+    /* Heading Animation */
+    .animate-slide-down {
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: slideDown 0.8s ease-in-out forwards;
+    }
+
+    /* Input Field Animation */
+    .animate-input {
+        transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .animate-input:focus {
+        border-color: #6610f2 !important;
+        box-shadow: 0 0 10px rgba(102, 16, 242, 0.5);
+    }
+
+    /* Button Animation */
+    .animate-button {
+        background: linear-gradient(135deg, #007bff, #6610f2);
+        color: white;
+        border: none;
+        transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
+    }
+
+    .animate-button:hover {
+        background: linear-gradient(135deg, #6610f2, #007bff);
+        transform: scale(1.05);
+        animation: bounce 0.3s ease-in-out;
+    }
+
+    /* Card Hover Effect */
+    .card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+    }
+</style>

@@ -1,0 +1,63 @@
+<%- include("layouts/header") %>
+<%- include("layouts/navbar") %>
+
+<!-- Hero Section -->
+<header class="bg-dark text-white text-center py-5">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Welcome to Snippet Manager</h1>
+        <p class="lead">Save, manage, and share your code snippets effortlessly.</p>
+        <% if (!data) { %>
+            <a href="/signup" class="btn btn-primary btn-lg px-4 me-3">Get Started</a>
+            <a href="/signin" class="btn btn-outline-light btn-lg px-4">Login</a>
+        <% } %>
+    </div>
+</header>
+
+<!-- Features Section -->
+<section class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">🔍 Find Snippets</h5>
+                    <p class="card-text">Easily search and access your saved code snippets anytime.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">✍️ Create Snippets</h5>
+                    <p class="card-text">Save important code snippets for quick access later.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 border-0">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">🔗 Share Snippets</h5>
+                    <p class="card-text">Share your code snippets with the community in one click.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call-to-Action Section -->
+<div class="text-center my-5">
+    <a href="/create" class="btn btn-success btn-lg px-4 me-3">Create a Snippet</a>
+    <a href="/show" class="btn btn-info btn-lg px-4">View Snippets</a>
+</div>
+
+<%- include("layouts/footer") %>
+
+<style>
+    .card {
+        transition: transform 0.3s ease-in-out;
+        border-radius: 10px;
+    }
+    .card:hover {
+        transform: scale(1.05);
+        background-color: #f8f9fa;
+    }
+</style>

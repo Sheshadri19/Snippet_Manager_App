@@ -1,0 +1,142 @@
+<%- include("layouts/header") %>
+<%- include("layouts/navbar") %>
+
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-4 p-4 animate-fade-in">
+            <h2 class="text-center mb-4 fw-bold animate-slide-down">🔑 Login</h2>
+
+            <form id="loginForm" action="/api/login" method="POST">
+                <!-- Email Input -->
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold">📧 Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control animate-input" id="email" name="email" placeholder="Enter your email address" required>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-semibold">🔒 Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control animate-input" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button id="loginBtn" type="submit" class="btn btn-gradient btn-lg w-100 mt-3 animate-button">
+                    🚀 Login
+                </button>
+
+                <!-- Loader Spinner (Initially Hidden) -->
+                <div id="loader" class="text-center mt-3 d-none">
+                    <button class="btn btn-primary" type="button" disabled>
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        <span>Loading...</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include("layouts/footer") %>
+
+<style>
+    /* Fade-in Animation */
+    .animate-fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.8s ease-in-out forwards;
+    }
+
+    /* Slide-down Animation */
+    .animate-slide-down {
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: slideDown 0.8s ease-in-out forwards;
+    }
+
+    /* Input Field Animation */
+    .animate-input {
+        transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .animate-input:focus {
+        border-color: #6610f2 !important;
+        box-shadow: 0 0 10px rgba(102, 16, 242, 0.5);
+    }
+
+    /* Button Animation */
+    .animate-button {
+        background: linear-gradient(135deg, #007bff, #6610f2);
+        color: white;
+        border: none;
+        transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
+    }
+
+    .animate-button:hover {
+        background: linear-gradient(135deg, #6610f2, #007bff);
+        transform: scale(1.05);
+        animation: bounce 0.3s ease-in-out;
+    }
+
+    /* Card Hover Effect */
+    .card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bounce {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+    }
+</style>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        
+        // Show loader and disable login button
+        document.getElementById("loader").classList.remove("d-none");
+        document.getElementById("loginBtn").disabled = true;
+
+        // Simulate a login process (replace with real form submission)
+        setTimeout(() => {
+            this.submit();
+        }, 2000);
+    });
+</script>
