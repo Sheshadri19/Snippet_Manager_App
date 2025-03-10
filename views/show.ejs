@@ -24,41 +24,13 @@
     <h2 class="text-center mb-4 fw-bold animate-slide-down">📜 All Snippets</h2>
 
     <div class="row" id="snippetContainer">
-        <% if (snippets.length === 0) { %>
-            <div class="col-12 text-center">
-                <div class="alert alert-warning p-4 rounded-4 shadow">
-                    <h4 class="fw-bold">😔 No Snippets Found</h4>
-                    <p class="mb-0">Start by adding some awesome code snippets!</p>
-                </div>
-            </div>
-        <% } else { %>
-            <% snippets.forEach(snippet => { %>
-                <div class="col-md-6 col-lg-4 mb-4 snippet-card" id="snippet-<%= snippet._id %>">
-                    <div class="card shadow-lg border-0 rounded-4 p-3 animate-fade-in">
-                        <!-- Snippet Title -->
-                        <h4 class="fw-bold"><%= snippet.title %></h4>
+        <!-- Snippets will be dynamically loaded here -->
+    </div>
 
-                        <!-- Code Block with Syntax Highlighting -->
-                        <pre><code class="language-javascript"><%= snippet.code %></code></pre>
-
-                        <!-- Created By -->
-                        <p class="text-muted"><strong>👤 Created By:</strong> <%= snippet.userDetails.name %></p>
-
-                        <!-- Delete Button -->
-                        <button class="btn btn-danger w-100 mt-2 animate-button delete-snippet" data-id="<%= snippet._id %>">
-                            🗑 Delete
-                        </button>
-
-                        <!-- Spinner (Initially Hidden) -->
-                        <div class="text-center mt-2 delete-spinner" id="spinner-<%= snippet._id %>" style="display: none;">
-                            <div class="spinner-border text-danger" role="status">
-                                <span class="visually-hidden">Deleting...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
-        <% } %>
+    <!-- Pagination -->
+    <div class="pagination-container text-center mt-4">
+        <button id="prevPage" class="btn btn-secondary pagination-btn animate-pagination-btn">← Previous</button>
+        <button id="nextPage" class="btn btn-secondary pagination-btn animate-pagination-btn">Next →</button>
     </div>
 
     <!-- Create Snippet Button -->
@@ -81,11 +53,50 @@
         const recommendationList = document.getElementById('recommendationList');
         const recommendations = document.getElementById('recommendations');
         const snippetContainer = document.getElementById('snippetContainer');
+        const prevPageButton = document.getElementById('prevPage');
+        const nextPageButton = document.getElementById('nextPage');
+        
+        let currentPage = 1;
+        const snippetsPerPage = 3;
+        let allSnippets = <%- JSON.stringify(snippets) %>; // All snippets fetched from the server
 
         // Function to highlight the matching part of the snippet
         function highlightSnippet(snippetText, query) {
             const regex = new RegExp(`(${query})`, 'gi');
             return snippetText.replace(regex, `<span class="highlighted">$1</span>`);
+        }
+
+        // Function to display snippets for the current page
+        function displaySnippets(page) {
+            snippetContainer.innerHTML = '';  // Clear current snippets
+            const startIndex = (page - 1) * snippetsPerPage;
+            const endIndex = page * snippetsPerPage;
+            const snippetsToShow = allSnippets.slice(startIndex, endIndex);
+
+            snippetsToShow.forEach(snippet => {
+                const snippetCard = document.createElement('div');
+                snippetCard.classList.add('col-md-6', 'col-lg-4', 'mb-4', 'snippet-card');
+                snippetCard.innerHTML = `
+                    <div class="card shadow-lg border-0 rounded-4 p-3 animate-fade-in">
+                        <h4 class="fw-bold">${snippet.title}</h4>
+                        <pre><code class="language-javascript">${snippet.code}</code></pre>
+                        <p class="text-muted"><strong>👤 Created By:</strong> ${snippet.userDetails.name}</p>
+                        <button class="btn btn-danger w-100 mt-2 animate-button delete-snippet" data-id="${snippet._id}">
+                            🗑 Delete
+                        </button>
+                        <div class="text-center mt-2 delete-spinner" id="spinner-${snippet._id}" style="display: none;">
+                            <div class="spinner-border text-danger" role="status">
+                                <span class="visually-hidden">Deleting...</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                snippetContainer.appendChild(snippetCard);
+            });
+
+            // Handle the visibility of pagination buttons
+            prevPageButton.style.display = page === 1 ? 'none' : 'inline-block';
+            nextPageButton.style.display = endIndex >= allSnippets.length ? 'none' : 'inline-block';
         }
 
         // Search functionality
@@ -127,6 +138,24 @@
             }
         });
 
+        // Pagination button click handling
+        prevPageButton.addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                displaySnippets(currentPage);
+            }
+        });
+
+        nextPageButton.addEventListener('click', function () {
+            if (currentPage * snippetsPerPage < allSnippets.length) {
+                currentPage++;
+                displaySnippets(currentPage);
+            }
+        });
+
+        // Initialize snippets display
+        displaySnippets(currentPage);
+
         // Delete functionality
         document.querySelectorAll(".delete-snippet").forEach(button => {
             button.addEventListener("click", function () {
@@ -144,7 +173,7 @@
                         if (data.success) {
                             snippetCard.remove(); // Remove snippet from UI
                             if (document.querySelectorAll(".snippet-card").length === 0) {
-                                snippetContainer.innerHTML = `
+                                snippetContainer.innerHTML = ` 
                                     <div class="col-12 text-center">
                                         <div class="alert alert-warning p-4 rounded-4 shadow">
                                             <h4 class="fw-bold">😔 No Snippets Found</h4>
@@ -164,7 +193,7 @@
 <style>
     /* Ensure All Snippet Boxes Are the Same Size */
     .snippet-card .card {
-        height: 300px; /* Fixed height */
+        height: 500px; /* Fixed height */
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -173,7 +202,7 @@
 
     /* Code Block Styling */
     .snippet-card pre {
-        height: 150px; /* Fixed height for code blocks */
+        height: 350px; /* Fixed height for code blocks */
         overflow: auto; /* Enable scrolling for long code */
         background: #282c34;
         color: #fff;
@@ -190,23 +219,35 @@
         text-overflow: ellipsis;
     }
 
-    /* Search Input Styling */
-    .search-input {
+    /* Pagination Button Styles */
+    .pagination-btn {
+        padding: 10px 20px;
         font-size: 16px;
-        padding: 15px 20px;
-        border-radius: 50px;
-        border: 2px solid #ddd;
-        width: 100%;
-        background: linear-gradient(to right, #6a11cb, #2575fc);
-        color: white;
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        margin: 0 10px;
         transition: all 0.3s ease;
     }
 
-    .search-input:focus {
-        outline: none;
-        border-color: #2575fc;
-        box-shadow: 0 0 10px rgba(37, 117, 252, 0.7);
+    .pagination-btn:hover {
+        transform: scale(1.1);
+        background-color: #007bff;
+        color: white;
+    }
+
+    .pagination-btn-active {
+        animation: bounce 0.3s ease-in-out;
+    }
+
+    /* Bounce animation */
+    @keyframes bounce {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+        }
     }
 
     /* Recommendations Styling */
@@ -239,106 +280,13 @@
         font-weight: bold;
     }
 
-    /* Create Snippet Button */
-    .create-snippet-btn {
-        padding: 12px 24px;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 8px;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .create-snippet-btn:hover {
-        background-color: #0056b3;
-        transform: scale(1.05);
-    }
-
-    /* Fade-in Animation */
-    .animate-fade-in {
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeIn 0.8s ease-in-out forwards;
-    }
-
-    /* Slide-down Animation */
-    .animate-slide-down {
-        opacity: 0;
-        transform: translateY(-20px);
-        animation: slideDown 0.8s ease-in-out forwards;
-    }
-
-    /* Button Animation */
-    .animate-button {
-        transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
-    }
-
-    .animate-button:hover {
-        transform: scale(1.05);
-        animation: bounce 0.3s ease-in-out;
-    }
-
     /* Card Hover Effect */
     .card {
         transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     }
 
     .card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-
-    /* Keyframe Animations */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes bounce {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-/* Enhancing Search Bar Focus Effect */
-.search-input:focus {
-    background: linear-gradient(to right, #2575fc, #6a11cb);
-    color: #fff;
-    box-shadow: 0 0 15px rgba(37, 117, 252, 0.7);
-}
-
-/* Responsive Design Fixes */
-@media (max-width: 768px) {
-    .snippet-card .card {
-        height: auto;
-    }
-
-    .search-input {
-        font-size: 14px;
-        padding: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .snippet-card h4 {
-        font-size: 16px;
-    }
-
-    .create-snippet-btn {
-        font-size: 16px;
-        padding: 10px 20px;
-    }
-}
 </style>
-       
