@@ -53,7 +53,7 @@ Snippet Manager App is a full-stack web application that allows users to securel
 
 
 ## Start App :" npm start"
-## server : "http://localhost:3000"
+## server : "http://localhost:6500"
 
 ### Step 1: Clone the Repository
 ```bash

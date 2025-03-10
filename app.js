@@ -10,7 +10,7 @@ const methodOverride = require('method-override');
 dotenv.config(); // Load environment variables
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 6500;
 
 // Set up EJS as the templating engine
 app.set("view engine", "ejs");
