@@ -2,6 +2,25 @@
 <%- include("layouts/navbar") %>
 
 <div class="container my-5">
+    <!-- Search Snippet Input -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <input 
+                type="text" 
+                id="searchSnippet" 
+                class="form-control search-input" 
+                placeholder="Search Snippets..." 
+                aria-label="Search Snippets"
+            />
+            <div id="recommendations" class="mt-3" style="display: none;">
+                <h5 class="recommendation-title">Recommendations:</h5>
+                <ul id="recommendationList" class="list-group">
+                    <!-- Recommendations will be dynamically added here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <h2 class="text-center mb-4 fw-bold animate-slide-down">📜 All Snippets</h2>
 
     <div class="row" id="snippetContainer">
@@ -58,6 +77,57 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById('searchSnippet');
+        const recommendationList = document.getElementById('recommendationList');
+        const recommendations = document.getElementById('recommendations');
+        const snippetContainer = document.getElementById('snippetContainer');
+
+        // Function to highlight the matching part of the snippet
+        function highlightSnippet(snippetText, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return snippetText.replace(regex, `<span class="highlighted">$1</span>`);
+        }
+
+        // Search functionality
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.toLowerCase();
+            const snippets = document.querySelectorAll('.snippet-card');
+
+            recommendationList.innerHTML = '';  // Clear previous recommendations
+            let hasRecommendations = false;
+
+            snippets.forEach(snippet => {
+                const title = snippet.querySelector('h4').innerText.toLowerCase();
+                const code = snippet.querySelector('pre').innerText.toLowerCase();
+
+                // Highlight matching title and code
+                if (title.includes(query) || code.includes(query)) {
+                    snippet.style.display = '';
+                    snippet.querySelector('h4').innerHTML = highlightSnippet(snippet.querySelector('h4').innerText, query);
+                    snippet.querySelector('pre code').innerHTML = highlightSnippet(snippet.querySelector('pre code').innerText, query);
+
+                    // Add to recommendations
+                    if (title.includes(query)) {
+                        hasRecommendations = true;
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item');
+                        listItem.textContent = title;
+                        recommendationList.appendChild(listItem);
+                    }
+                } else {
+                    snippet.style.display = 'none';
+                }
+            });
+
+            // Show or hide recommendations
+            if (hasRecommendations && query.length > 0) {
+                recommendations.style.display = 'block';
+            } else {
+                recommendations.style.display = 'none';
+            }
+        });
+
+        // Delete functionality
         document.querySelectorAll(".delete-snippet").forEach(button => {
             button.addEventListener("click", function () {
                 const snippetId = this.getAttribute("data-id");
@@ -74,7 +144,7 @@
                         if (data.success) {
                             snippetCard.remove(); // Remove snippet from UI
                             if (document.querySelectorAll(".snippet-card").length === 0) {
-                                document.getElementById("snippetContainer").innerHTML = `
+                                snippetContainer.innerHTML = `
                                     <div class="col-12 text-center">
                                         <div class="alert alert-warning p-4 rounded-4 shadow">
                                             <h4 class="fw-bold">😔 No Snippets Found</h4>
@@ -118,6 +188,55 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    /* Search Input Styling */
+    .search-input {
+        font-size: 16px;
+        padding: 15px 20px;
+        border-radius: 50px;
+        border: 2px solid #ddd;
+        width: 100%;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        color: white;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #2575fc;
+        box-shadow: 0 0 10px rgba(37, 117, 252, 0.7);
+    }
+
+    /* Recommendations Styling */
+    #recommendations {
+        display: none;
+        margin-top: 20px;
+    }
+
+    #recommendationList {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .recommendation-title {
+        font-size: 18px;
+        color: #6c757d;
+    }
+
+    .highlighted {
+        background-color: yellow;
+        font-weight: bold;
     }
 
     /* Create Snippet Button */
@@ -180,23 +299,46 @@
         }
     }
 
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    @keyframes bounce {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Enhancing Search Bar Focus Effect */
+.search-input:focus {
+    background: linear-gradient(to right, #2575fc, #6a11cb);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(37, 117, 252, 0.7);
+}
+
+/* Responsive Design Fixes */
+@media (max-width: 768px) {
+    .snippet-card .card {
+        height: auto;
     }
 
-    @keyframes bounce {
-        0%, 100% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.1);
-        }
+    .search-input {
+        font-size: 14px;
+        padding: 12px;
     }
+}
+
+@media (max-width: 480px) {
+    .snippet-card h4 {
+        font-size: 16px;
+    }
+
+    .create-snippet-btn {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+}
 </style>
+       
